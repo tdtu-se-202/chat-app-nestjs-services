@@ -10,7 +10,7 @@ export class UpdateUserProfileDto {
   })
   @IsNotEmpty()
   @IsEmail()
-  readonly email: string;
+  readonly email?: string;
 
   @ApiProperty({
     required: false,
@@ -51,4 +51,7 @@ export class UpdateUserProfileDto {
     message: 'Invalid phone number',
   })
   readonly phoneNumber?: string;
+
+  readonly refreshToken?: any;
+
 }
