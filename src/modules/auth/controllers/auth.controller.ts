@@ -1,98 +1,39 @@
-import { Controller, Post, UseGuards, Get, Body } from '@nestjs/common';
-import { AuthService } from '../services/auth.service';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiForbiddenResponse,
-  ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
-import { LoginUserDto } from '../../users/dtos/login-user.dto';
-import { CreateUserDto } from '../../users/dtos/create-user.dto';
-import { GoogleAuthGuard } from '../guards/google-auth.guard';
-import { FacebookAuthGuard } from '../guards/facebook-auth.guard';
-import { RefreshTokenGuard } from '../guards/rt.guard';
-import { Public } from '../decorators/public.decorator';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
+import { AuthDto } from "../dtos/auth.dto";
+import { AuthService } from "../services/auth.service";
+import { CreateUserDto } from "../../users/dtos/create-user.dto";
+import { AccessTokenGuard } from "../guards/access-token.guard";
+import { RefreshTokenGuard } from "../guards/refresh-token.guard";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@Controller('auth')
 @ApiBearerAuth()
 @ApiTags('auth')
-@Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-  @ApiOperation({ summary: 'Login' })
-  @ApiCreatedResponse({
-    description: 'Login successful',
-  })
-  @ApiForbiddenResponse({
-    description: `Forbidden. Cannot login`,
-  })
-  @Post('login')
-  @Public()
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.login(loginUserDto);
+  @Post('signup')
+  signup(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signUp(createUserDto);
   }
 
+  @Post('signin')
+  signin(@Body() data: AuthDto) {
+    return this.authService.signIn(data);
+  }
+
+  @Get('logout')
+  @UseGuards(AccessTokenGuard)
+  logout(@Req() req: Request) {
+    this.authService.logout(req.user['sub']);
+  }
+
+  @Get('refresh')
   @UseGuards(RefreshTokenGuard)
-  @Post('refresh')
-  @Public()
-  refreshTokens(userId: string, refreshToken: string) {
+  refreshTokens(@Req() req: Request) {
+    const userId = req.user['sub'];
+    const refreshToken = req.user['refreshToken'];
     return this.authService.refreshTokens(userId, refreshToken);
-  }
-
-  @ApiOperation({ summary: 'Create new user' })
-  @ApiCreatedResponse({
-    description: 'Create a use',
-  })
-  @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-  @ApiForbiddenResponse({
-    description: `Forbidden. Cannot create new user`,
-  })
-  @Post('create')
-  @Public()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.authService.createUser(createUserDto);
-  }
-
-  @ApiOperation({ summary: 'Google Login' })
-  @ApiCreatedResponse({
-    description: 'Login with google successful',
-  })
-  @ApiForbiddenResponse({
-    description: `Forbidden. Login with google fail`,
-  })
-  @Get('google/login')
-  @UseGuards(GoogleAuthGuard)
-  handleGoogleLogin() {
-    return { msg: 'Google Authentication' };
-  }
-
-  @Get('google/redirect')
-  @UseGuards(GoogleAuthGuard)
-  @Public()
-  handleGoogleRedirect() {
-    return { msg: 'OK' };
-  }
-
-  @ApiOperation({ summary: 'Facebook login' })
-  @ApiCreatedResponse({
-    description: 'Login with facebook successful',
-  })
-  @ApiForbiddenResponse({
-    description: `Forbidden. Login with facebook fail`,
-  })
-  @Get('facebook/login')
-  @Public()
-  @UseGuards(FacebookAuthGuard)
-  handleFacebookLogin() {
-    return { msg: 'Facebook Authentication' };
-  }
-
-  @Get('facebook/redirect')
-  @UseGuards(FacebookAuthGuard)
-  @Public()
-  handleFacebookRedirect() {
-    return { msg: 'OK' };
   }
 }

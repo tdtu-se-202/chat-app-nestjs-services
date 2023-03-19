@@ -19,16 +19,13 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Public } from '../../auth/decorators/public.decorator';
 import { UsersService } from '../services/users.service';
 import { UpdateUserProfileDto } from '../dtos/update-user.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { AuthHelper } from '../../../helpter/auth-helper';
+import { AccessTokenGuard } from "../../auth/guards/access-token.guard";
 
 @Controller('users')
 @ApiBearerAuth()
 @ApiTags('users')
-@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -38,27 +35,6 @@ export class UsersController {
     return true;
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('example')
-  example(@Request() req) {
-    console.log(AuthHelper.getEmailFromToken(req.headers.authorization));
-    return true;
-  }
-
-  @Public()
-  @Post('/public')
-  testPublic() {
-    return true;
-  }
-
-  @ApiOperation({
-    summary: `Get my profile`,
-  })
-  @Get('/me')
-  @UseGuards(JwtAuthGuard)
-  me(@Request() req) {
-    return this.usersService.findOneByEmail(req.user.email);
-  }
 
   @ApiOperation({
     summary: `Get user information`,
@@ -75,7 +51,7 @@ export class UsersController {
     name: 'id',
   })
   @Get('/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AccessTokenGuard)
   getUser(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
@@ -95,8 +71,25 @@ export class UsersController {
     name: 'id',
   })
   @Put('/:id')
+  @UseGuards(AccessTokenGuard)
   updateUser(@Param('id') id: string, @Body() dto: UpdateUserProfileDto) {
     return this.usersService.updateOne(id, dto);
+  }
+
+  @ApiOperation({
+    summary: `Upload user's avatar`,
+  })
+  @ApiOkResponse({
+    description: 'Upload avatar successful',
+  })
+  @ApiParam({
+    type: String,
+    name: 'id',
+  })
+  @Put('/:id')
+  @UseGuards(AccessTokenGuard)
+  uploadAvatar(@Param('id') id: string, @Body() dto: UpdateUserProfileDto) {
+    return false;
   }
 
 }
