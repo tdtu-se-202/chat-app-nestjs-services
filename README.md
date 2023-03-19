@@ -47,7 +47,7 @@ npm run typeorm:run-migrations
 ## Swagger
 
 ```bash
-docker inspect | grep IPAddress
+docker inspect chatty-app-server | grep IPAddress
 ```
 then use the `IPAddress` value and access to the link formated below:
 

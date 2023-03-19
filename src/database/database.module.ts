@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { postgresConfig, postgresConfigToken } from "./ormconfig";
+import { postgresConfig, postgresConfigToken } from "./postgres.config";
 
 @Module({
   imports: [
