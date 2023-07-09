@@ -15,7 +15,7 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('documentation', app, document);
   // app.use(
   //   session({
   //     secret: 'secretKey',
@@ -26,10 +26,15 @@ async function bootstrap() {
   //     },
   //   }),
   // );
-  app.enableCors();
-  // app.use(passport.initialize());
+  app.enableCors({
+    origin: 'http://localhost:4927',
+    credentials: true,
+  });  // app.use(passport.initialize());
   // app.use(passport.session());
-  await app.listen(parseInt(process.env.APP_PORT) || 3000);
-}
+  await app.listen(process.env.APP_PORT || 3000, () => {
+    const server = app.getHttpServer();
+    const { port } = server.address();
+    console.log(`Application is listening on port ${port}`);
+  });}
 
 bootstrap();

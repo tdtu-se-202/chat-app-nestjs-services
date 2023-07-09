@@ -20,6 +20,8 @@ export class AuthController {
 
   @Post('signin')
   signin(@Body() data: AuthDto) {
+    console.log("harry-log: 🚀  file: auth.controller.ts  line: 23  AuthController  signin ~ data: "
+        , data);
     return this.authService.signIn(data);
   }
 

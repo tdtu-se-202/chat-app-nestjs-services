@@ -20,7 +20,7 @@ services:
             context: .
             dockerfile: Dockerfile
         ports:
-            - "3001:3001"
+            - "9696:9696"
         volumes:
             - .:/usr/src/app
             - /usr/src/app/node_modules
