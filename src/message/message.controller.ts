@@ -1,41 +1,48 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { MessageService } from './message.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
+import { MessageService } from "./message.service";
 
-@Controller('messages')
+@Controller("messages")
 export class MessageController {
   constructor(private messageService: MessageService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async getMessage(@Param('id') id: string) {
-    const message = await this.messageService.getMessage({ id });
-    return message;
+  @Get(":id")
+  async getMessage(@Param("id") id: string) {
+    return await this.messageService.getMessage({ id });
   }
 
-  @Get('channel/:id')
-  async getMessagesByChannel(@Param('id') id: string) {
-    const message = await this.messageService.getMessagesByChannel({ id });
-    return message;
+  @Get("channel/:id")
+  async getMessagesByChannel(@Param("id") id: string) {
+    return await this.messageService.getMessagesByChannel({ id });
   }
 
-  @Post('')
+  @Post("")
   async createMessage(@Body() body) {
-    const result = await this.messageService.addMessage(body);
-    return result;
+    return await this.messageService.addMessage(body);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  async updateMessage(@Param('id') id: string, @Body() body) {
-    const result = await this.messageService.updateMessage({ id, message:body });
-    return result;
+  @Put(":id")
+  async updateMessage(@Param("id") id: string, @Body() body) {
+    return await this.messageService.updateMessage({
+      id,
+      message: body,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async deleteMessage(@Param('id') id: string) {
-    const result = await this.messageService.deleteMessage({ id });
-    return result;
+  @Delete(":id")
+  async deleteMessage(@Param("id") id: string) {
+    return await this.messageService.deleteMessage({ id });
   }
 }
