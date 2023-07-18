@@ -4,7 +4,6 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle("Chatty App")
@@ -23,7 +22,7 @@ async function bootstrap() {
   await app.listen(process.env.APP_PORT || 9696, () => {
     const server = app.getHttpServer();
     const { port, address } = server.address();
-    const protocol = process.env.PROTOCOL || 'http';
+    const protocol = process.env.PROTOCOL || "http";
     console.log(`Server started at ${protocol}://${address}:${port}`);
   });
 }
