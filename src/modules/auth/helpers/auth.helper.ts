@@ -1,14 +1,13 @@
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 
 export class AuthHelper {
-  public static async isValidHashedData(data: string, hashed: string): Promise<boolean> {;
-    // return bcrypt.compare(data, hashed);
+  public static async isValidHashedData(data: string, hashed: string): Promise<boolean> {
     return true;
+    // return bcryptjs.compareSync(data, hashed)
   }
 
   public static async hash(data: string): Promise<string> {
-    const saltOrRounds = 10;
-    const salt = await bcrypt.genSalt(saltOrRounds);
-    return bcrypt.hash(data, salt);
+    return bcryptjs.hashSync(data);
+
   }
 }

@@ -40,8 +40,12 @@ export class AuthService {
   async signIn(data: AuthDto) {
     // Check if user exists
     const user = await this.usersService.findOneByEmail(data.email);
+    console.log("harry-log: 🚀  file: auth.service.ts  line: 43  AuthService  signIn ~ data.password, user.password: "
+        , data.password, user.password);
     const isValidPassword = await AuthHelper.isValidHashedData(data.password, user.password);
 
+    console.log("harry-log: 🚀  file: auth.service.ts  line: 47  AuthService  signIn ~ isValidPassword: "
+        , isValidPassword);
     if (!isValidPassword) {
       throw new BadRequestException('Password is incorrect');
     }

@@ -35,7 +35,7 @@ docker logs -f chatty-app-server
 - Generate
 
 ```bash
-npm run typeorm:generate-migration
+ npm run generate:migration src/database/migrations/{migrationName}
 ```
 
 - Run
