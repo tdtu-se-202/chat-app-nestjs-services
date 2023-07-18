@@ -1,25 +1,30 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-// import { setupSwagger } from './swagger';
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  // app.enableCors();
-  // // setupSwagger(app);
-  // const configService = app.get(ConfigService);
-  // const port = Number(configService.get("APP_PORT"));
-  // await app.listen(port);
+  app.enableCors();
+
+  const config = new DocumentBuilder()
+    .setTitle("Chatty App")
+    .setDescription("The Chatty API description")
+    .setVersion("1.0")
+    .addTag("chatty-app")
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api", app, document);
 
   app.enableCors({
     origin: "http://localhost:3001",
     credentials: true,
-  }); // app.use(passport.initialize());
-  // app.use(passport.session());
+  });
+
   await app.listen(process.env.APP_PORT || 9696, () => {
     const server = app.getHttpServer();
-    const { port } = server.address();
-    console.log(`Application is listening on port ${port}`);
+    const { port, address } = server.address();
+    const protocol = process.env.PROTOCOL || 'http';
+    console.log(`Server started at ${protocol}://${address}:${port}`);
   });
 }
 bootstrap();
