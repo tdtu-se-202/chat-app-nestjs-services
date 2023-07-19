@@ -1,45 +1,24 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { ResponseTransformInterceptor } from './interceptors/response.interceptor';
-import { DataSource } from 'typeorm';
-import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
-import DatabaseModule from "./database/database.module";
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthController } from "./auth/auth.controller";
+import { AuthModule } from "./auth/auth.module";
+import { ChannelModule } from "./channel/channel.module";
+import { MessageModule } from "./message/message.module";
+import { UserModule } from "./user/user.module";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: `${process.cwd()}/src/.env.${process.env.NODE_ENV}`,
-      isGlobal: true,
-    }),
-    DatabaseModule,
     AuthModule,
-    UsersModule,
-    CloudinaryModule
+    UserModule,
+    ChannelModule,
+    MessageModule,
+    ConfigModule.forRoot({
+      envFilePath: ".env",
+    }),
   ],
-  controllers: [],
-  providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RolesGuard,
-    // },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
-    // },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ResponseTransformInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
-    },
-  ],
-  exports: [AuthModule, UsersModule],
+  controllers: [AppController, AuthController],
+  providers: [AppService],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-}
+export class AppModule {}
