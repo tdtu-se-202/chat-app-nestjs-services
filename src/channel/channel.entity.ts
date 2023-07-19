@@ -29,6 +29,9 @@ export class Channel extends Model {
   @Column(DataType.STRING(50))
   public name: string;
 
+  @Default(
+    "https://res.cloudinary.com/chatty-app-tdtu/image/upload/v1689778045/dfbwdn094dnhzvbe5ycy.jpg"
+  )
   @Column(DataType.STRING)
   public image: string;
 }

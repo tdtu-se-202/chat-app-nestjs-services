@@ -32,7 +32,7 @@ export class User extends Model {
   public about: string;
 
   @Default(
-    "https://res.cloudinary.com/dtzs4c2uv/image/upload/v1666326774/noavatar_rxbrbk.png"
+    "https://res.cloudinary.com/chatty-app-tdtu/image/upload/v1689777953/ziytdemphil1mcx96juj.png"
   )
   @Column(DataType.STRING)
   public image: string;
