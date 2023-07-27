@@ -17,7 +17,8 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "database:init": "ts-node ./src/database/init.ts"
     },
     "dependencies": {
         "@nestjs/common": "^9.0.0",
@@ -29,6 +30,7 @@
         "@nestjs/platform-socket.io": "^9.3.10",
         "@nestjs/swagger": "^7.1.1",
         "@nestjs/websockets": "^9.3.10",
+        "@socket.io/redis-adapter": "^8.2.1",
         "bcryptjs": "^2.4.3",
         "cors": "^2.8.5",
         "passport": "^0.6.0",
@@ -36,10 +38,12 @@
         "passport-local": "^1.0.0",
         "pg": "^8.10.0",
         "pg-hstore": "^2.3.4",
+        "redis": "^4.6.7",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.2.0",
         "sequelize": "^6.29.3",
-        "sequelize-typescript": "^2.1.5"
+        "sequelize-typescript": "^2.1.5",
+        "socket.io": "^4.7.1"
     },
     "devDependencies": {
         "@nestjs/cli": "^9.2.0",
