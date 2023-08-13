@@ -21,6 +21,7 @@
         "test:e2e": "jest --config ./test/jest-e2e.json"
     },
     "dependencies": {
+        "@nestjs/cli": "^9.2.0",
         "@nestjs/common": "^9.0.0",
         "@nestjs/config": "^2.3.1",
         "@nestjs/core": "^9.0.0",
@@ -43,7 +44,6 @@
         "sequelize-typescript": "^2.1.5"
     },
     "devDependencies": {
-        "@nestjs/cli": "^9.2.0",
         "@nestjs/schematics": "^9.0.0",
         "@types/bcryptjs": "^2.4.2",
         "@types/cookie-parser": "^1.4.3",
