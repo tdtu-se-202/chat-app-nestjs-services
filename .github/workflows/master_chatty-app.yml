@@ -1,6 +1,5 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Node.js app to Azure Web App - chatty-app
 
 on:
@@ -33,11 +32,11 @@ jobs:
       - name: Install production dependencies in dist
         run: |
           cd dist
-          npm ci --production
+          npm install --production
 
       - name: Archive Files
         run: |
-          zip -r dist.zip dist
+          zip -r dist.zip dist/*
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -46,4 +45,4 @@ jobs:
           app-name: 'chatty-app'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8381CBA6FBAB462DB11515B2558805D5 }}
-          package: .
+          package: ./dist.zip
