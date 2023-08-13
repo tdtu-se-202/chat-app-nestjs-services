@@ -34,10 +34,6 @@ jobs:
           cd dist
           npm install --production
 
-      - name: Archive Files
-        run: |
-          zip -r ../dist.zip *
-
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -45,4 +41,4 @@ jobs:
           app-name: 'chatty-app'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8381CBA6FBAB462DB11515B2558805D5 }}
-          package: ./dist.zip
+          package: ./dist
