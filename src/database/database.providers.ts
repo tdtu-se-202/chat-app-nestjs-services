@@ -10,8 +10,18 @@ export const databaseProviders = [
       let config;
       let sequelize;
       if (process.env.NODE_ENV === "production") {
+        console.log(
+          "harry-log: 🚀  file: database.providers.ts  line: 13  process.env.DB_URL  useFactory ~ : ",
+          process.env.DB_URL
+        );
         sequelize = new Sequelize(process.env.DB_URL, {
           dialect: "postgres",
+          dialectOptions: {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false,
+            },
+          },
         });
       } else {
         config = {
@@ -26,7 +36,7 @@ export const databaseProviders = [
       }
 
       console.log(
-        "harry-log: 🚀  file: database.providers.ts  line: 228 ??  config  useFactory ~ : ",
+        "harry-log: 🚀  file: database.providers.ts  line: 39 -  config  useFactory ~ : ",
         sequelize
       );
       sequelize.addModels([User, Message, Channel]);
