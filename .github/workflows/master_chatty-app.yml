@@ -36,7 +36,7 @@ jobs:
 
       - name: Archive Files
         run: |
-          zip -r dist.zip dist/*
+          zip -r ../dist.zip *
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
