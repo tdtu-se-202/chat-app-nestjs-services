@@ -22,10 +22,13 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Put(":id")
   async updateUser(@Param("id") id: string, @Body() body) {
-    await this.userService.updateUser({ id, ...body });
+    const user = await this.userService.updateUser({ id, ...body });
     return {
       statusCode: "200",
       message: "User updated successfully.",
+      data: {
+        user: user,
+      },
     };
   }
 
