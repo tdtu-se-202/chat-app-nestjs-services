@@ -9,14 +9,15 @@ type SocketIOMiddleWare = {
 };
 
 export const SocketAuthMiddleware = (authService: AuthService): SocketIOMiddleWare => {
-  return (socket, next) => {
+  return async (socket, next) => {
     try {
-      const BarrerToken =
-      socket.handshake.auth.token || socket.handshake.headers['authorization'] || socket.handshake.query.authorization;
+      const BearerToken = socket.handshake.auth.authorization || socket.handshake.headers['authorization'] || socket.handshake.query.authorization;
       //configService.isValidAuthHeader(authorization);
-      authService.verifyJwt(BarrerToken.split(' ')[1])
+      //console.log(BearerToken)
+      await authService.verifyJwt(BearerToken.split(' ')[1])
       next();
     } catch (e) {
+      console.log('socket middleware error:', e)
       next(new Error(`Unauthorized: ${e.message}`));
     }
   };
@@ -48,17 +49,19 @@ export const SocketAuthMiddleware = (authService: AuthService): SocketIOMiddleWa
 export const createTokenMiddleware =
   (authService: AuthService) =>
   async (socket: AuthenticatedSocket, next) => {
-    const BarrerToken =
-      socket.handshake.auth.token || socket.handshake.headers['authorization'] || socket.handshake.query.authorization;
+    const BearerToken: string =
+      socket.handshake.auth.authorization || socket.handshake.headers['authorization'] || socket.handshake.query.authorization;
 
     //console.debug(`Validating auth token before connection: ${BarrerToken}`);
 
     try {
-      const payload = await authService.verifyJwt(BarrerToken.split(' ')[1]);
-      console.debug(payload)
+      // console.log(BearerToken)
+      const payload = await authService.verifyJwt(BearerToken.split(' ')[1]);
+      // console.debug(payload)
       socket.user = payload as any;
       next();
     } catch (e) {
+      console.log('IO middleware error:', e)
       next(new Error(`Unauthorized: ${e.message}`));
     }
   };

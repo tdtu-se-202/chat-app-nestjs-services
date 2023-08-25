@@ -28,18 +28,17 @@ export class WsJwtAuthGuard extends AuthGuard('ws-jwt') {//implements CanActivat
     super()
   }
   canActivate(context: ExecutionContext) {
-    console.log('canactive excute new')
+    //console.log('canactive excute new')
     if (context.getType() !== 'ws') {
       return false
     }
 
     const client = context.switchToWs().getClient<Socket>();
-    const { authorization } = client.handshake.headers ?? client.handshake.auth;
-    console.log(client.handshake.headers.authorization)
-    console.log(client.handshake.query.authenticated)
-    if ((typeof authorization === 'undefined') || authorization === null || '') {
-      console.log(authorization)
-      context.switchToWs().getClient().handshake.headers['authorization'] = client.handshake.query.authorization
+    let authorization = client.handshake.headers['authorization'] || client.handshake.auth.authorization || client.handshake.query.authorization;
+  
+    if ((typeof client.handshake.headers['authorization'] === 'undefined')) {
+      
+      context.switchToWs().getClient().handshake.headers['authorization'] = authorization
     }
     //const payload = this.authService.verifyJwt(authorization);
 
@@ -56,10 +55,10 @@ export class WsJwtAuthGuard extends AuthGuard('ws-jwt') {//implements CanActivat
   }
 
   handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
-    console.log("handle request excute")
+    // console.log("handle request excute")
     // context.switchToWs().getData().user = user;
     context.switchToWs().getClient<AuthenticatedSocket>().user = user;
-    console.log(user)
+    
     if (!user) {
       throw err
     }

@@ -79,5 +79,6 @@ export class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   handleMessage(@MessageBody() message: MessageDto) {
     this.server.emit("chat", message);
     this.messageService.addMessage(message);
+    return {event: 'chat', data: 'message'}
   }
 }
