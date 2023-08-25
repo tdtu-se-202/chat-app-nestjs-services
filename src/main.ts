@@ -15,7 +15,10 @@ async function bootstrap() {
   SwaggerModule.setup("api", app, document);
 
   app.enableCors({
-    origin: ["http://localhost:3001"],
+    origin: [
+      "http://localhost:3001",
+      "https://white-island-00bebbb10.3.azurestaticapps.net",
+    ],
     credentials: true,
   });
 
