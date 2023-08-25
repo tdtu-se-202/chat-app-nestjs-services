@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Put, UseGuards } from "@nestjs/common";
-import { Query } from "@nestjs/common/decorators";
+import { Query } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { UserService } from "./user.service";
 

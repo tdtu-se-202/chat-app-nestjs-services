@@ -7,6 +7,7 @@ import { AuthModule } from "./auth/auth.module";
 import { ChannelModule } from "./channel/channel.module";
 import { MessageModule } from "./message/message.module";
 import { UserModule } from "./user/user.module";
+import { FriendModule } from "./friend/friend.module";
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserModule } from "./user/user.module";
     UserModule,
     ChannelModule,
     MessageModule,
+    FriendModule,
     ConfigModule.forRoot({
       envFilePath: ".env",
     }),

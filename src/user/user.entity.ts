@@ -7,8 +7,12 @@ import {
   Default,
   BeforeCreate,
   Unique,
+  HasMany,
 } from "sequelize-typescript";
 import * as bcrypt from "bcryptjs";
+import { Friend } from "src/friend/entities/friends.entity";
+import { BelongsToMany } from "sequelize-typescript";
+import { FriendRequest } from "src/friend/entities/friend-requests.entity";
 
 @Table({ createdAt: false, updatedAt: false })
 export class User extends Model {
@@ -45,6 +49,15 @@ export class User extends Model {
 
   @Column(DataType.ARRAY(DataType.UUID))
   public requests: Array<string>;
+
+  @BelongsToMany(() => User, () => Friend,'userId', 'friendId')
+  public friendInfors: Array<User>;
+
+  @BelongsToMany(() => User, () => FriendRequest, 'userId')
+  public friendRequestToUsers: User[];
+
+  @BelongsToMany(() => User, () => FriendRequest, 'friendId')
+  public friendRequestFromUsers: User[];
 
   @BeforeCreate
   static async hashPassword(user: User) {

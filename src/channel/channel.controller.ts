@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { Delete, Put } from "@nestjs/common/decorators";
+import { Delete, Put } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { ChannelService } from "./channel.service";
 import { ChannelDto } from "./dto/create-channel-dto";
