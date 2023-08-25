@@ -85,8 +85,8 @@ services:
 
 networks:
     chatty-app:
-        external:
-            name: chatty-app
+        external: true
+            # name: chatty-app
 
 volumes:
     postgres:
