@@ -32,9 +32,9 @@ services:
         ports:
             - "9696:9696"
             - "9000:9000"
-        volumes:
-            - .:/usr/src/app
-            - /usr/src/app/node_modules
+        # volumes:
+        #     - .:/usr/src/app
+        #     - /usr/src/app/node_modules
         command: npm run start:prod
         depends_on:
             - postgres
@@ -53,9 +53,9 @@ services:
         ports:
             - "9697:9696"
             - "9001:9000"
-        volumes:
-            - .:/usr/src/app
-            - /usr/src/app/node_modules
+        # volumes:
+        #     - .:/usr/src/app
+        #     - /usr/src/app/node_modules
         command: npm run start:prod
         depends_on:
             postgres:

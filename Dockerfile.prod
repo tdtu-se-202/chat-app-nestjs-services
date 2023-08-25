@@ -30,7 +30,7 @@ COPY --from=build /usr/src/app/package*.json ./
 RUN npm install --only=production && npm cache clean --force
 
 # ./dist
-COPY --from=build /usr/src/app/dist ./
+COPY --from=build /usr/src/app/dist ./dist
 
 # RUN rm package*.json
 # COPY --from=build /usr/src/app/node_modules ./node_modules
