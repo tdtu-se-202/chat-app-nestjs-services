@@ -17,6 +17,10 @@ async function bootstrap() {
 
   app.enableCors({
     origin: "*",
+    // origin: [
+    //   "http://localhost:3001",
+    //   "https://white-island-00bebbb10.3.azurestaticapps.net",
+    // ],
     credentials: true,
   });
 

@@ -22,6 +22,7 @@ import { UserService } from "src/user/user.service";
 import { AuthService } from "src/auth/auth.service";
 import { AuthenticatedSocket } from "./dto/authenticated-socket";
 import { SocketAuthMiddleware } from "./middlewares/ws-auth.mw";
+import { NotificationDto } from "./dto/notification-dto";
 
 @WebSocketGateway(9000 ,{
   cors: {origin: '*'},
@@ -80,5 +81,10 @@ export class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGat
     this.server.emit("chat", message);
     this.messageService.addMessage(message);
     return {event: 'chat', data: 'message'}
+  }
+
+  @SubscribeMessage("notification")
+  handleNotification(@MessageBody() notification: NotificationDto) {
+    this.server.emit("notification", notification);
   }
 }
