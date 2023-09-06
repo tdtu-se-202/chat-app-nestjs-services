@@ -28,7 +28,7 @@ export class RedisIoAdapter extends IoAdapter {
     const server = super.createIOServer(port, options);
     server.adapter(this.adapterConstructor);
     const authService = this.app.get(AuthService);
-    server.of('/').use(createTokenMiddleware(authService));
+    //server.of('/').use(createTokenMiddleware(authService));
     return server;
   }
 

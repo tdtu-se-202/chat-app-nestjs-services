@@ -10,7 +10,7 @@ import {
   WsException,
   WsResponse,
 } from "@nestjs/websockets";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { MessageService } from "src/message/message.service";
 import { MessageDto } from "./dto/message-dto";
 import { UseGuards, UseInterceptors, UseFilters, Injectable, Logger } from "@nestjs/common";
@@ -29,10 +29,10 @@ import { NotificationDto } from "./dto/notification-dto";
   transports: ['websocket'],
 })
 
-@UseGuards(WsJwtAuthGuard)
+//@UseGuards(WsJwtAuthGuard)
 // /@UseInterceptors(ClassSerializerInterceptor)
-@UseInterceptors(WebsocketsInterceptor)
-@UseFilters(WebsocketsExceptionFilter)
+//@UseInterceptors(WebsocketsInterceptor)
+//@UseFilters(WebsocketsExceptionFilter)
 @Injectable()
 export class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
   private logger: Logger = new Logger('GatewayServer')
@@ -47,26 +47,27 @@ export class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGat
 
   afterInit(server: Server) {
     this.logger.log(`Socket server is listening at port: 9000`)
-    server.use(SocketAuthMiddleware(this.authService) as any); // because types are broken
+    //server.use(SocketAuthMiddleware(this.authService) as any); // because types are broken
   }
 
-  handleConnection(@ConnectedSocket() socket: AuthenticatedSocket) {
+  //AuthenticatedSocket
+  handleConnection(@ConnectedSocket() socket: Socket) {
     try {
-      console.log(`connected socket: {id: ${socket.id}, username: ${socket.user.username}}`);
+      console.log(`connected socket: {id: ${socket.id}}`)//, username: ${socket.user.username}}`);
       
       // handle connection logic here
-      socket.broadcast.emit('server-send-new-online-user', socket.user)
-      this.server.emit('server-send-new-online-user', socket.user)
+      //socket.broadcast.emit('server-send-new-online-user', socket.user)
+      //this.server.emit('server-send-new-online-user', socket.user)
 
     } catch (error) {
-      console.log(`process connect failed, socket: {id: ${socket.id}, username: ${socket.user.username}}`)
+      console.log(`process connect failed, socket: {id: ${socket.id}}`)//, username: ${socket.user.username}}`);
       socket.disconnect()
-      throw new WsException(`process connect failed, socket: {id: ${socket.id}, username: ${socket.user.username}}`);
+      throw new WsException(`process connect failed, socket: {id: ${socket.id}}`)//, username: ${socket.user.username}}`);
     }
   }
 
-  handleDisconnect(socket: AuthenticatedSocket) {
-    console.log(`disconnected socket: {id: ${socket.id}, username: ${socket.user.username}}`);
+  handleDisconnect(socket: Socket) {
+    console.log(`disconnected socket: {id: ${socket.id}}`)//, username: ${socket.user.username}}`);
   }
 
   @SubscribeMessage("client-send-test-message")
@@ -77,14 +78,16 @@ export class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   }
 
   @SubscribeMessage("chat")
-  handleMessage(@MessageBody() message: MessageDto) {
-    this.server.emit("chat", message);
+  handleMessage(@MessageBody() message: MessageDto, @ConnectedSocket() socket: Socket) {
+    socket.broadcast.emit("chat", message);
+    //this.server.emit("chat", message);
     this.messageService.addMessage(message);
-    return {event: 'chat', data: 'message'}
+    return {event: 'chat', data: message}
   }
 
   @SubscribeMessage("notification")
   handleNotification(@MessageBody() notification: NotificationDto) {
     this.server.emit("notification", notification);
+    return {event: 'notification', data: notification}
   }
 }
