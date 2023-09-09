@@ -59,6 +59,10 @@ export class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGat
       //socket.broadcast.emit('server-send-new-online-user', socket.user)
       //this.server.emit('server-send-new-online-user', socket.user)
 
+      let serverName = process.env.APP_NAME
+      console.log(serverName)
+      socket.emit("server-name", {serverName});
+
     } catch (error) {
       console.log(`process connect failed, socket: {id: ${socket.id}}`)//, username: ${socket.user.username}}`);
       socket.disconnect()
@@ -79,7 +83,9 @@ export class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGat
 
   @SubscribeMessage("chat")
   handleMessage(@MessageBody() message: MessageDto, @ConnectedSocket() socket: Socket) {
-    socket.broadcast.emit("chat", message);
+    let serverName = process.env.APP_NAME
+    console.log(serverName)
+    socket.broadcast.emit("chat", {...message, serverName});
     //this.server.emit("chat", message);
     this.messageService.addMessage(message);
     return {event: 'chat', data: message}

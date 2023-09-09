@@ -31,6 +31,10 @@ services:
         ports:
             - "9696:9696"
             - "9000:9000"
+        env_file:
+            - .env
+        environment:
+            - APP_NAME=S001
         volumes:
             - .:/usr/src/app
             - /usr/src/app/node_modules
@@ -51,6 +55,10 @@ services:
         ports:
             - "9697:9696"
             - "9001:9000"
+        env_file:
+            - .env
+        environment:
+            - APP_NAME=S002
         volumes:
             - .:/usr/src/app
             - /usr/src/app/node_modules
