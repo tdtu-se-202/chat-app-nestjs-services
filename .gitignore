@@ -69,3 +69,9 @@ dist
 /packages/graphql
 /benchmarks/memory
 build/config\.gypi
+
+# package-log
+package-log.json
+
+# otp
+db-volumes/

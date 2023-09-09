@@ -7,6 +7,7 @@ import { UserService } from "../user/user.service";
 import { JwtService } from "@nestjs/jwt";
 import { CreateUserDto } from "src/user/dto/create-user.dto";
 import * as bcrypt from "bcryptjs";
+import { JWT_SECRET } from "src/utils/constants";
 
 @Injectable()
 export class AuthService {
@@ -48,5 +49,12 @@ export class AuthService {
       statusCode: "201",
       message: "User created successfully.",
     };
+  }
+
+  async verifyJwt(jwt: string): Promise<any> {
+    return this.jwtService.verifyAsync(jwt, 
+      {
+        secret: JWT_SECRET
+      });
   }
 }

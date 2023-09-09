@@ -1,17 +1,36 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common/exceptions";
 import sequelize, { Op } from "sequelize";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "./user.entity";
+import { FriendRequestService } from "src/friend/services/friend-request.service";
+import { FriendRequestEnum } from "src/friend/enums/friend-request.enum";
+import { CreateFriendRequestDto } from "src/friend/dtos/create-friend-request.dto";
+import { UpdateFriendRequestDto } from "src/friend/dtos/update-friend-request.dto";
+import { FriendRequest } from "src/friend/entities/friend-requests.entity";
+import { Friend } from "src/friend/entities/friends.entity";
+import { isEnum } from "class-validator";
+import { FriendService } from "src/friend/services/friend.service";
+import { CreateFriendDto } from "src/friend/dtos/create-friend.dto";
 
 @Injectable()
 export class UserService {
+  constructor(
+    private readonly friendRequestService: FriendRequestService,
+    private readonly friendService: FriendService
+  ) {}
+
   async findByEmail(email: string): Promise<User | undefined> {
     return await User.findOne({ where: { email } });
   }
 
   async findById(id: string): Promise<User | undefined> {
     return await User.findByPk(id, {
+      include: [
+        {
+          association: User.associations.friendInfors
+        }
+      ],
       attributes: { exclude: ["password"] },
     });
   }
@@ -23,11 +42,15 @@ export class UserService {
   }
 
   async createUser({ email, username, password }: CreateUserDto): Promise<any> {
-    return await User.create({
-      email,
-      username,
-      password,
-    });
+    try {
+      return await User.create({
+        email,
+        username,
+        password,
+      });
+    } catch (e) {
+      return e
+    }
   }
 
   async updateUser(user: any): Promise<any> {
@@ -52,11 +75,22 @@ export class UserService {
         friends.push(user);
       }
 
+      const friendList = (await User.findByPk(id, {
+        include: [{
+          association: User.associations.friendInfors,
+          attributes: {
+            exclude: ['password']
+          }
+        }]
+      })).friendInfors
+
       return {
         statusCode: "200",
-        friends,
+        friends: friendList,
+        //friendtest: friendList
       };
     } catch (error) {
+      console.log(error)
       return {
         statusCode: "404",
         message: "Friends not found.",
@@ -90,7 +124,7 @@ export class UserService {
       };
 
     if (status) {
-      this.setRequest({ id: otherId, otherId: id, status: false });
+      this.setRequest({ id: otherId, otherId: id, status: FriendRequestEnum.FriendAccepted });
 
       User.update(
         {
@@ -106,6 +140,27 @@ export class UserService {
         { friends: sequelize.fn("array_append", sequelize.col("friends"), id) },
         { where: { id: otherId } }
       );
+      
+      let createFriendDto: CreateFriendDto = {
+        userId: firstUser.id,
+        friendId: secondUser.id
+      }
+
+      try {
+        let result = await this.friendService.makeFriends(createFriendDto)  
+        if (result instanceof Error) {
+          return {
+            statusCode: "400",
+            message: result.message
+          }
+        } 
+      } catch (error) {
+        return {
+          statusCode: "400",
+          message: error
+        }
+      }
+
     } else {
       User.update(
         {
@@ -121,6 +176,21 @@ export class UserService {
         { friends: sequelize.fn("array_remove", sequelize.col("friends"), id) },
         { where: { id: otherId } }
       );
+
+      try {
+        let result = await this.friendService.deleteFriends(firstUser.id, secondUser.id)
+        if (result.statusCode !== "200") {
+          return {
+            statusCode: "400",
+            message: "Error when delete friend"
+          }
+        } 
+      } catch (error) {
+        return {
+          statusCode: "400",
+          message: error.message
+        }
+      }
     }
 
     return {
@@ -139,11 +209,27 @@ export class UserService {
         requests.push(user);
       }
 
+      const requestsList = (await User.findByPk(id, {
+        include: [{
+          association: User.associations.friendRequestFromUsers,
+          through: { 
+            where: {
+              friendStatus: FriendRequestEnum.FriendRequested
+            }
+          },
+          attributes: {
+            exclude: ['password']
+          }
+        }]
+      })).friendRequestFromUsers
+
       return {
         statusCode: "200",
-        requests,
+        //requests: requests,
+        requests: requestsList
       };
-    } catch {
+    } catch (e) {
+      console.log(e)
       return {
         statusCode: "404",
         message: "Requests not found.",
@@ -154,6 +240,14 @@ export class UserService {
   async setRequest({ id, otherId, status }) {
     const firstUser = await this.findById(id);
     const secondUser = await this.findById(otherId);
+
+    let isValidFriendRequestStatus = isEnum(status, FriendRequestEnum)
+    if (!(isValidFriendRequestStatus)) {
+         return {
+           statusCode: "404",
+           message: "friend request status is not valid!",
+        }
+    }
 
     // Check if user exists
     if (!firstUser || !secondUser)
@@ -170,24 +264,43 @@ export class UserService {
       };
 
     // Check if users are friends
-    if (status && secondUser.friends && secondUser.friends.includes(id))
+    if (status === FriendRequestEnum.FriendRequested && secondUser.friends && secondUser.friends.includes(id))
       return {
         statusCode: "406",
         message: "You are already friends.",
       };
-    if (status && secondUser.requests && secondUser.requests.includes(id))
+    if (status === FriendRequestEnum.FriendRequested && secondUser.requests && secondUser.requests.includes(id))
       return {
         statusCode: "409",
         message: "You already sent a request to this user.",
       };
 
-    if (status) {
+    if (status === FriendRequestEnum.FriendRequested) {
       User.update(
         {
           requests: sequelize.fn("array_append", sequelize.col("requests"), id),
         },
         { where: { id: otherId } }
       );
+
+      let createFriendRequestDto: CreateFriendRequestDto = {
+        userId: id,
+        friendId: secondUser.id,
+        friendStatus: FriendRequestEnum.FriendRequested
+      }
+      
+      try {
+        let result = await this.friendRequestService.createOne(createFriendRequestDto)
+        if (!(result instanceof FriendRequest)) 
+        return {
+          statusCode: result.statusCode,
+          message: result.message
+        }
+
+      } catch (error) {
+        return error
+      }
+
     } else {
       User.update(
         {
@@ -195,6 +308,22 @@ export class UserService {
         },
         { where: { id: otherId } }
       );
+      
+  
+      let updateFriendRequestDto = {
+        userId: secondUser.id,
+        friendId: id,
+        friendStatus: status
+      }
+      if (status === false) {
+        updateFriendRequestDto.friendStatus = FriendRequestEnum.FriendRemoved
+      }
+
+      const frqToUpdate = await this.friendRequestService.findOneByConditions({userId: secondUser.id, friendId: id})
+      
+      if (frqToUpdate) {
+        await this.friendRequestService.updateOne(frqToUpdate.id, updateFriendRequestDto)
+      }
     }
 
     return {
